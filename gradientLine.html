@@ -1,0 +1,126 @@
+<head>
+	<title>Gradient Rotating Line</title>
+	<meta
+		description="Rotates a line from the center of the canvas, much like the free Radar RGB effect. This version has a gradient between the foreground and background to ensure smooth transitions between colours" />
+	<meta publisher="stronk" />
+	<meta property="speed" label="Speed" type="number" min="0" max="100" default="10">
+	<meta property="distance" label="Line Width" type="number" min="1" max="320" default="100">
+	<meta property="bg" label="Background Colour" type="color" default="#00141e" min="0" max="360" />
+	<meta property="fg" label="Foreground Colour" type="color" default="#2aff5d" min="0" max="360" />
+</head>
+
+<body style="margin: 0; padding: 0;">
+	<canvas id="exCanvas" width="320" height="200"></canvas>
+</body>
+
+<script>
+	var c = document.getElementById("exCanvas");
+	var ctx = c.getContext("2d");
+	var width = 320;
+	var height = 200;
+	var rotate = 1;
+	var h = -1;
+	var s = -1;
+	var l = -1;
+
+
+	function hexToHSL(H) {
+		// Convert hex to RGB first
+		let r = 0, g = 0, b = 0;
+		if (H.length == 4) {
+			r = "0x" + H[1] + H[1];
+			g = "0x" + H[2] + H[2];
+			b = "0x" + H[3] + H[3];
+		} else if (H.length == 7) {
+			r = "0x" + H[1] + H[2];
+			g = "0x" + H[3] + H[4];
+			b = "0x" + H[5] + H[6];
+		}
+		// Then to HSL
+		r /= 255;
+		g /= 255;
+		b /= 255;
+		let cmin = Math.min(r, g, b),
+			cmax = Math.max(r, g, b),
+			delta = cmax - cmin,
+			h = 0,
+			s = 0,
+			l = 0;
+
+		if (delta == 0)
+			h = 0;
+		else if (cmax == r)
+			h = ((g - b) / delta) % 6;
+		else if (cmax == g)
+			h = (b - r) / delta + 2;
+		else
+			h = (r - g) / delta + 4;
+
+		h = Math.round(h * 60);
+
+		if (h < 0)
+			h += 360;
+
+		l = (cmax + cmin) / 2;
+		s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+		s = +(s * 100).toFixed(1);
+		l = +(l * 100).toFixed(1);
+
+		return [h, s, l];
+	}
+
+	function update() {
+		if (h == -1 || s == -1 || l == -1) {
+			[h, s, l] = hexToHSL(fg);
+		}
+		// Reset canvas
+		ctx.fillStyle = bg;
+		ctx.fillRect(0, 0, width, height);
+
+		// Update rotation of line
+		rotate += speed;
+
+		// Calculate useful anchor points
+		startPoint = {
+			x: (width / 2) - (distance / 2),
+			y: (height / 2)
+		};
+		endPoint = {
+			x: startPoint.x + distance,
+			y: startPoint.y + height
+		};
+		midPoint = {
+			x: startPoint.x + (endPoint.x - startPoint.x) * 0.5,
+			y: startPoint.y + (endPoint.y - startPoint.y) * 0.5
+		};
+
+		// Define gradient for line
+		var grd = ctx.createLinearGradient(startPoint.x, 0, endPoint.x, 0);
+		grd.addColorStop(0, `hsla(${h}, ${s}%, ${l}%, 0)`);
+		grd.addColorStop(0.06, `hsla(${h}, ${s}%, ${l}%, 0.019)`);
+		grd.addColorStop(0.08575, `hsla(${h}, ${s}%, ${l}%, 0.037)`);
+		grd.addColorStop(0.1225, `hsla(${h}, ${s}%, ${l}%, 0.075)`);
+		grd.addColorStop(0.175, `hsla(${h}, ${s}%, ${l}%, 0.15)`);
+		grd.addColorStop(0.25, `hsla(${h}, ${s}%, ${l}%, 0.3)`);
+		grd.addColorStop(0.5, `hsla(${h}, ${s}%, ${l}%, 1.0)`);
+		grd.addColorStop(0.750, `hsla(${h}, ${s}%, ${l}%, 0.3)`);
+		grd.addColorStop(0.825, `hsla(${h}, ${s}%, ${l}%, 0.15)`);
+		grd.addColorStop(0.8775, `hsla(${h}, ${s}%, ${l}%, 0.075)`);
+		grd.addColorStop(0.91425, `hsla(${h}, ${s}%, ${l}%, 0.037)`);
+		grd.addColorStop(0.94, `hsla(${h}, ${s}%, ${l}%, 0.019)`);
+		grd.addColorStop(1.0000, `hsla(${h}, ${s}%, ${l}%, 0)`);
+
+		// Draw rectangle
+		ctx.beginPath();
+		ctx.translate(midPoint.x, startPoint.y);
+		ctx.rotate(0.001 * rotate);
+		ctx.translate(-midPoint.x, -startPoint.y);
+		ctx.rect(startPoint.x, startPoint.y, distance, height);
+		ctx.fillStyle = grd;
+		ctx.fill();
+		ctx.closePath();
+
+		window.requestAnimationFrame(update);
+	}
+	window.requestAnimationFrame(update);
+</script>
