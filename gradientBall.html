@@ -98,14 +98,12 @@
 		grd.addColorStop(1, `hsla(${h}, ${s}%, ${l}%, 0)`);
 
 		ctx.beginPath();
-		// Rotate Ball around center
-		ctx.translate(midPoint.x, midPoint.y);
-		ctx.translate(0, distance);
+		// Rotate canvas around the ball
+		ctx.translate(midPoint.x, midPoint.y + distance);
 		ctx.rotate(0.001 * rotate);
-		ctx.translate(-midPoint.x, -midPoint.y);
-		ctx.translate(0, -distance);
+		ctx.translate(-midPoint.x, -midPoint.y - distance);
 		// Draw Ball
-		ctx.arc(midPoint.x, midPoint.y, midPoint.x - 2, 0, Math.PI * 2, false);
+		ctx.arc(midPoint.x, midPoint.y, radius, 0, Math.PI * 2, false);
 		ctx.fillStyle = grd;
 		ctx.fill();
 		ctx.closePath();
