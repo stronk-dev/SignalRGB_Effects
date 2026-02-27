@@ -73,12 +73,13 @@
 		if (h == -1 || s == -1 || l == -1) {
 			[h, s, l] = hexToHSL(fg);
 		}
-		// Reset canvas
+		// Reset canvas transform and clear
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.fillStyle = bg;
 		ctx.fillRect(0, 0, width, height);
 
-		// Update rotation of line
-		rotate += speed;
+		// Update rotation of line (wrap to avoid precision loss)
+		rotate = (rotate + speed) % 6283.185;
 
 		// Calculate useful anchor points
 		startPoint = {
