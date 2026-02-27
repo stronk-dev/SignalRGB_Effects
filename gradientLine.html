@@ -18,7 +18,7 @@
 	var ctx = c.getContext("2d");
 	var width = 320;
 	var height = 200;
-	var rotate = 1;
+	var rotate = 0;
 	var h = -1;
 	var s = -1;
 	var l = -1;
@@ -78,8 +78,8 @@
 		ctx.fillStyle = bg;
 		ctx.fillRect(0, 0, width, height);
 
-		// Update rotation of line (wrap to avoid precision loss)
-		rotate = (rotate + speed) % 6283.185;
+		// Update rotation of line (wrap at full revolution)
+		rotate = (rotate + speed * 0.001) % (2 * Math.PI);
 
 		// Calculate useful anchor points
 		startPoint = {
@@ -114,7 +114,7 @@
 		// Draw rectangle
 		ctx.beginPath();
 		ctx.translate(midPoint.x, startPoint.y);
-		ctx.rotate(0.001 * rotate);
+		ctx.rotate(rotate);
 		ctx.translate(-midPoint.x, -startPoint.y);
 		ctx.rect(startPoint.x, startPoint.y, distance, height);
 		ctx.fillStyle = grd;
