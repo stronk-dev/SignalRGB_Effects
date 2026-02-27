@@ -74,7 +74,8 @@
 		if (h == -1 || s == -1 || l == -1) {
 			[h, s, l] = hexToHSL(fg);
 		}
-		// Reset canvas
+		// Reset canvas transform and clear
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.fillStyle = bg;
 		ctx.fillRect(0, 0, width, height);
 
@@ -84,8 +85,8 @@
 			y: (height / 2) - distance
 		};
 
-		// Increment rotation
-		rotate += speed
+		// Increment rotation (wrap to avoid precision loss)
+		rotate = (rotate + speed) % 6283.185
 
 		// Define gradient for ball
 		var grd = ctx.createRadialGradient(midPoint.x, midPoint.y, 0, midPoint.x, midPoint.y, radius);
