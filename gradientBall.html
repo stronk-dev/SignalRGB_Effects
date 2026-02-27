@@ -19,7 +19,7 @@
 	var ctx = c.getContext("2d");
 	var width = 320;
 	var height = 200;
-	var rotate = 1;
+	var rotate = 0;
 	var h = -1;
 	var s = -1;
 	var l = -1;
@@ -85,8 +85,8 @@
 			y: (height / 2) - distance
 		};
 
-		// Increment rotation (wrap to avoid precision loss)
-		rotate = (rotate + speed) % 6283.185
+		// Increment rotation (wrap at full revolution)
+		rotate = (rotate + speed * 0.001) % (2 * Math.PI);
 
 		// Define gradient for ball
 		var grd = ctx.createRadialGradient(midPoint.x, midPoint.y, 0, midPoint.x, midPoint.y, radius);
@@ -101,7 +101,7 @@
 		ctx.beginPath();
 		// Rotate canvas around the ball
 		ctx.translate(midPoint.x, midPoint.y + distance);
-		ctx.rotate(0.001 * rotate);
+		ctx.rotate(rotate);
 		ctx.translate(-midPoint.x, -midPoint.y - distance);
 		// Draw Ball
 		ctx.arc(midPoint.x, midPoint.y, radius, 0, Math.PI * 2, false);
